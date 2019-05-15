@@ -7,23 +7,31 @@ php_version=$1
 PHPVersion=$(php -r "echo PHP_VERSION;");
 current_php_version=${PHPVersion:0:3};
 
+## GET pretended php file
+php_file=/usr/bin/php$php_version
+
 if [ "$(whoami)" != 'root' ]; then
 	echo $"You have no permission to run $0 as non-root user. Use sudo"
 	exit 1;
 fi
 
-disable_php_cmd="a2dismod php$current_php_version"
-enable_php_cmd="a2enmod php$php_version"
+if [ $"php_version" == $"current_php_version" ]; then
+	echo $"php$php_version is your current php version. Aborting ..."
+	exit 1;
+fi
 
-create_symlink_php="ln -sfn /usr/bin/php$php_version /etc/alternatives/php";
+if [ ! -f "$php_file" ]; then
+    	echo $"php$php_version is not installed, aborting..."
+	exit 1;
+fi
 
-eval $disable_php_cmd
-eval $enable_php_cmd
+eval "a2dismod php$current_php_version"
+eval "a2enmod php$php_version"
 
-echo -e $"Creating symlink...\n"
-eval $create_symlink_php
+echo -e $"Updating main php file"
+eval "update-alternatives --set php /usr/bin/php$php_version"
 
-/etc/init.d/apache2 reload
+eval "service apache2 restart"
 
 echo -e $"Complete!\nYou just changed to PHP $php_version."
 exit 0;
