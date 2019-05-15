@@ -2,6 +2,7 @@ PHP version Manage Script
 ===========
 
 Bash Script to allow you to change PHP version
+
 *Only tested in Ubuntu and using Apache. Nginx, MacOS and Windows is not supported by this script*
 
 ## Installation ##
